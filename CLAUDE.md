@@ -38,6 +38,9 @@ pytest tests/test_task_01.py
 - Keep changes scoped to the task. Don't refactor unrelated files.
 - When unsure, prefer reading the test file first — it tells you exactly
   what behavior is expected.
+- When implementing a feature that adds a requirement for the user that 
+  impacts tests, ask for guidance on how to implement the feature to get 
+  the tests to past. Never default to changing the tests.
 
 ## Working with Claude here
 
