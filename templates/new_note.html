@@ -11,6 +11,8 @@
     button { background: #1a2540; color: #fff; padding: 0.5rem 1.25rem; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
     a { color: #555; margin-left: 1rem; }
     .error { color: #b00020; margin-top: 0.25rem; font-size: 0.9rem; }
+    .tag-input { display: flex; gap: 0.5rem; align-items: center; margin-top: 0.25rem; }
+    .tag-input input { width: auto; flex: 1; }
   </style>
 </head>
 <body>
@@ -24,8 +26,27 @@
     <label for="body">Body</label>
     <textarea id="body" name="body" rows="6">{{ body or '' }}</textarea>
 
+    {% for tag in tags %}
+      <input type="hidden" name="tags" value="{{ tag }}">
+    {% endfor %}
+
+    {% if tags %}
+    <div class="applied-tags">
+      <p><strong>Active Tags:</strong>
+        {% for tag in tags %}<span class="tag">{{ tag }}</span>{% if not loop.last %}, {% endif %}{% endfor %}
+      </p>
+    </div>
+    {% endif %}
+
+    <label for="tag_name">Tags</label>
+    <div class="tag-input">
+      <input type="text" name="tag_name" id="tag_name" placeholder="Tag name">
+      <button type="submit" name="newTag" value="true">Add Tag</button>
+    </div>
+    {% if tag_error %}<p class="error">{{ tag_error }}</p>{% endif %}
+
     <div class="actions">
-      <button type="submit">Save note</button>
+      <button type="submit">Create Note</button>
       <a href="{{ url_for('home') }}">Cancel</a>
     </div>
   </form>
