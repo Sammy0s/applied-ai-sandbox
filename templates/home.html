@@ -22,7 +22,7 @@
   {% if notes %}
     {% for note in notes %}
       <div class="note">
-        <h3>{{ note.title }}</h3>
+        <h3>{{ note.title }}{% for tag in note.get('tags', []) %}<span style="color: green; font-size: 0.85rem; font-weight: normal; margin-left: 0.5rem;">{{ tag }}</span>{% endfor %}</h3>
         <p>{{ note.body }}</p>
       </div>
     {% endfor %}
