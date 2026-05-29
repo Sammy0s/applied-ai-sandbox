@@ -15,11 +15,12 @@ def create_app() -> Flask:
     # In-memory store for the sandbox. Resets on every restart, which is
     # fine for practice. Real apps use a database.
     app.notes: list[dict] = []  # type: ignore[attr-defined]
+    app._next_id: int = 0  # type: ignore[attr-defined]
 
     @app.route("/")
     def home():
-        pinned   = [(i, n) for i, n in enumerate(app.notes) if n.get("is_pinned", False)]
-        unpinned = [(i, n) for i, n in enumerate(app.notes) if not n.get("is_pinned", False)]
+        pinned   = [(n.get("id", i), n) for i, n in enumerate(app.notes) if n.get("is_pinned", False)]
+        unpinned = [(n.get("id", i), n) for i, n in enumerate(app.notes) if not n.get("is_pinned", False)]
         return render_template("home.html", notes=app.notes, pinned=pinned, unpinned=unpinned)
 
     def sanitize_tags(tag_list):
@@ -54,18 +55,20 @@ def create_app() -> Flask:
             elif not body:
                 error = "Body is required"
             else:
-                app.notes.append({"title": title, "body": body, "tags": tags, "is_pinned": False})
+                app.notes.append({"id": app._next_id, "title": title, "body": body, "tags": tags, "is_pinned": False})
+                app._next_id += 1
                 return redirect(url_for("home"))
             return render_template("new_note.html", error=error, title=title, body=body, tags=tags)
         return render_template("new_note.html", tags=[])
 
     # TASK 02 will add a /notes/<idx>/delete route here.
 
-    @app.route("/notes/<int:idx>/pin", methods=["POST"])
-    def toggle_pin(idx):
-        if idx >= len(app.notes) or idx >= len(app.notes):
+    @app.route("/notes/<int:note_id>/pin", methods=["POST"])
+    def toggle_pin(note_id):
+        note = next((n for n in app.notes if n.get("id") == note_id), None)
+        if note is None:
             abort(404)
-        app.notes[idx]["is_pinned"] = not app.notes[idx].get("is_pinned", False)
+        note["is_pinned"] = not note.get("is_pinned", False)
         return redirect(url_for("home"))
 
     return app
