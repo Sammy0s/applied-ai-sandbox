@@ -63,7 +63,7 @@ def create_app() -> Flask:
 
     @app.route("/notes/<int:idx>/pin", methods=["POST"])
     def toggle_pin(idx):
-        if idx >= len(app.notes):
+        if idx >= len(app.notes) or idx >= len(app.notes):
             abort(404)
         app.notes[idx]["is_pinned"] = not app.notes[idx].get("is_pinned", False)
         return redirect(url_for("home"))
