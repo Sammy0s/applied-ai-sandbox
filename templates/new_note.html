@@ -25,6 +25,7 @@
 
     <label for="body">Body</label>
     <textarea id="body" name="body" rows="6">{{ body or '' }}</textarea>
+    <span id="char-counter" style="color:#999;font-size:0.8rem;">0 characters</span>
 
     {% for tag in tags %}
       <input type="hidden" name="tags" value="{{ tag }}">
@@ -50,5 +51,14 @@
       <a href="{{ url_for('home') }}">Cancel</a>
     </div>
   </form>
+  <script>
+    const bodyEl = document.getElementById('body');
+    const counter = document.getElementById('char-counter');
+    function updateCount() {
+      counter.textContent = bodyEl.value.trim().length + ' characters';
+    }
+    bodyEl.addEventListener('input', updateCount);
+    updateCount();
+  </script>
 </body>
 </html>
