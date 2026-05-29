@@ -10,6 +10,8 @@
     .note { border: 1px solid #ddd; border-radius: 8px; padding: 1rem; margin-bottom: 0.75rem; }
     .note h3 { margin: 0 0 0.5rem; }
     a.btn { display: inline-block; background: #1a2540; color: #fff; padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none; }
+    .pin-btn { background: none; border: none; cursor: pointer; font-size: 1rem; float: right; padding: 0; }
+    h2.section-label { margin-top: 1.5rem; margin-bottom: 0.5rem; }
   </style>
 </head>
 <body>
@@ -19,14 +21,34 @@
   <a class="btn" href="{{ url_for('new_note') }}">+ New note</a>
 
   <h2 style="margin-top: 2rem;">Your notes ({{ notes|length }})</h2>
-  {% if notes %}
-    {% for note in notes %}
+
+  {% if pinned %}
+    <h2 class="section-label">📌 Pinned Notes</h2>
+    {% for idx, note in pinned %}
       <div class="note">
+        <form method="POST" action="/notes/{{ idx }}/pin" style="display:inline;float:right">
+          <button class="pin-btn" title="Unpin">📌</button>
+        </form>
         <h3>{{ note.title }}{% for tag in note.get('tags', []) %}<span style="color: green; font-size: 0.85rem; font-weight: normal; margin-left: 0.5rem;">{{ tag }}</span>{% endfor %}</h3>
         <p>{{ note.body }}</p>
       </div>
     {% endfor %}
-  {% else %}
+  {% endif %}
+
+  {% if unpinned %}
+    {% if pinned %}<h2 class="section-label">Notes</h2>{% endif %}
+    {% for idx, note in unpinned %}
+      <div class="note">
+        <form method="POST" action="/notes/{{ idx }}/pin" style="display:inline;float:right">
+          <button class="pin-btn" title="Pin">📍</button>
+        </form>
+        <h3>{{ note.title }}{% for tag in note.get('tags', []) %}<span style="color: green; font-size: 0.85rem; font-weight: normal; margin-left: 0.5rem;">{{ tag }}</span>{% endfor %}</h3>
+        <p>{{ note.body }}</p>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  {% if not notes %}
     <p>No notes yet.</p>
   {% endif %}
 </body>

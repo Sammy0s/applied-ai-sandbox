@@ -5,7 +5,7 @@ describe exactly what "done" means.
 """
 from __future__ import annotations
 
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, abort
 
 
 def create_app() -> Flask:
@@ -18,7 +18,9 @@ def create_app() -> Flask:
 
     @app.route("/")
     def home():
-        return render_template("home.html", notes=app.notes)
+        pinned   = [(i, n) for i, n in enumerate(app.notes) if n.get("is_pinned", False)]
+        unpinned = [(i, n) for i, n in enumerate(app.notes) if not n.get("is_pinned", False)]
+        return render_template("home.html", notes=app.notes, pinned=pinned, unpinned=unpinned)
 
     def sanitize_tags(tag_list):
         seen = []
@@ -52,12 +54,19 @@ def create_app() -> Flask:
             elif not body:
                 error = "Body is required"
             else:
-                app.notes.append({"title": title, "body": body, "tags": tags})
+                app.notes.append({"title": title, "body": body, "tags": tags, "is_pinned": False})
                 return redirect(url_for("home"))
             return render_template("new_note.html", error=error, title=title, body=body, tags=tags)
         return render_template("new_note.html", tags=[])
 
     # TASK 02 will add a /notes/<idx>/delete route here.
+
+    @app.route("/notes/<int:idx>/pin", methods=["POST"])
+    def toggle_pin(idx):
+        if idx >= len(app.notes):
+            abort(404)
+        app.notes[idx]["is_pinned"] = not app.notes[idx].get("is_pinned", False)
+        return redirect(url_for("home"))
 
     return app
 
